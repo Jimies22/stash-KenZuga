@@ -1,31 +1,27 @@
-import { MongoClient, ServerApiVersion } from "mongodb";
-import dotenv from "dotenv";
+import mongoose from "mongoose";
 
-// Load environment variables
-dotenv.config();
-
-const uri = process.env.MONGODB_URI;
-
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  },
-});
-
-async function connectDB() {
+const connectDB = async () => {
   try {
-    await client.connect();
-    await client.db("admin").command({ ping: 1 });
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
-    return client; // Return the client so it can be used elsewhere
-  } catch (err) {
-    console.error("Failed to connect to MongoDB:", err);
-    throw err; // Re-throw the error for handling elsewhere
-  }
-}
+    console.log("Attempting to connect to MongoDB...");
 
-export { client, connectDB };
+    if (!process.env.MONGODB_URI) {
+      throw new Error("MONGODB_URI is not defined in environment variables");
+    }
+
+    const conn = await mongoose.connect(process.env.MONGODB_URI, {
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    });
+
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+    console.log(`Database Name: ${conn.connection.name}`);
+    console.log(`Connection State: ${mongoose.connection.readyState}`);
+
+    return conn;
+  } catch (error) {
+    console.error("MongoDB connection error:", error);
+    throw error; // Propagate error to be handled by caller
+  }
+};
+
+export { connectDB };
