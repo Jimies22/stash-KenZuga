@@ -3,9 +3,10 @@ import userController from "../../controllers/userController.js";
 import { protect, admin } from "../../middleware/authMiddleware.js";
 import {
   validateUser,
+  validateUserID,
   errorHandler,
   notFound,
-} from "../../middleware/error_valid_Middleware.js";
+} from "../../middleware/ervalMiddleware.js";
 
 const router = express.Router();
 
@@ -15,20 +16,23 @@ router.get("/search/:name", userController.searchUsersByName);
 
 // Protected routes (require authentication)
 router.get("/all", protect, userController.getAllUsers);
-router.get("/:userID", protect, userController.getUserById);
+router.get("/:userID", protect, validateUserID, userController.getUserById);
 
 // Admin only routes
 router.put(
   "/update/:userID",
   protect,
   admin,
+  validateUserID,
   validateUser,
   userController.updateUser
 );
-router.delete("/deslete/:userID", protect, admin, userController.deleteUser);
-
-// Error Handling Middleware
-router.use(notFound);
-router.use(errorHandler);
+router.delete(
+  "/delete/:userID",
+  protect,
+  admin,
+  validateUserID,
+  userController.deleteUser
+);
 
 export default router;

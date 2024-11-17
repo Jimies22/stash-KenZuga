@@ -6,6 +6,7 @@ export const validateUser = [
   body("name").notEmpty().withMessage("Name is required"),
   body("role").isIn(["user", "admin"]).withMessage("Invalid role"),
   body("department").optional().isString(),
+  body("userID").optional().isInt().withMessage("User ID must be an integer"),
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -37,3 +38,15 @@ export const notFound = (req, res, next) => {
   res.status(404);
   next(error);
 };
+
+// Add this validation
+export const validateUserID = [
+  body("userID").isInt().withMessage("User ID must be an integer"),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+  },
+];

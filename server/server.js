@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import itemRoutes from "./routes/admin/itemRoute.js";
 import userRoutes from "./routes/user/userRoutes.js";
-import { errorHandler, notFound } from "./middleware/error_valid_Middleware.js";
+import { errorHandler, notFound } from "./middleware/ervalMiddleware.js";
 
 dotenv.config();
 
@@ -72,3 +72,7 @@ app.listen(port, () => {
 process.on("unhandledRejection", (err) => {
   console.error("Unhandled Rejection:", err);
 });
+
+// Add error handling last
+app.use(notFound);
+app.use(errorHandler);
